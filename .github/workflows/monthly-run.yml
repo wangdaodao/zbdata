@@ -1,0 +1,43 @@
+name: Monthly Run
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 * *'  # 每月 1 号 0 点执行
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install axios cheerio exceljs
+
+      - name: Run script
+        run: node index.js
+
+      - name: Get current month
+        id: month
+        run: echo "month=$(date +'%Y-%m')" >> $GITHUB_OUTPUT
+
+      - name: Create directory for the month
+        run: mkdir -p ${{ steps.month.outputs.month }}
+
+      - name: Move generated files to monthly directory
+        run: mv *.xlsx ${{ steps.month.outputs.month }}/
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git diff --quiet && git diff --staged --quiet || git commit -m "Add monthly data for ${{ steps.month.outputs.month }}"
+          git push
