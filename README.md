@@ -1,3 +1,3 @@
 # 招标网数据抓取
 
-每月自动执行，抓取https://hq.zhaobiao.cn/data_0_0.html中的数据。
+每月自动执行，抓取 https://hq.zhaobiao.cn/data_0_0.html 中的数据。
